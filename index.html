@@ -2086,14 +2086,8 @@ document.getElementById("btn-share").addEventListener("click", shareResult);
 // PRINT
 // ═══════════════════════════════════════════════════════════
 function doPrint() {
-  // Спросим: с ответами или без
-  const withAnswers = confirm("Печатать С ответами (учительский экземпляр)?\nОК — с ответами\nОтмена — пустой бланк для учеников");
-  document.body.dataset.print = withAnswers ? "answers" : "blank";
-  // Дать браузеру миг применить стили
-  setTimeout(() => {
-    window.print();
-    delete document.body.dataset.print;
-  }, 50);
+  // Открываем отдельный print.html — там аккуратная вёрстка под A4 и переключатель Пустой/С ответами
+  window.open("print.html", "_blank");
 }
 document.getElementById("btn-print").addEventListener("click", doPrint);
 </script>

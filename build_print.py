@@ -223,9 +223,9 @@ def render_page(show_answers: bool, other_url: str, title_extra: str) -> str:
     toolbar = f"""
     <div class="toolbar">
       <button onclick="window.print()">Печать</button>
-      <a href="print.html" class="{'current' if not show_answers else ''}">Пустой</a>
-      <a href="print_answers.html" class="{'current' if show_answers else ''}">С ответами</a>
-      <a href="index.html">Интерактив</a>
+      <a href="./print.html" class="{'current' if not show_answers else ''}">Пустой</a>
+      <a href="./print_answers.html" class="{'current' if show_answers else ''}">С ответами</a>
+      <a href="./">Интерактив</a>
     </div>
     """
     field_row = "" if show_answers else """

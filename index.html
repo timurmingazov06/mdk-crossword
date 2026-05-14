@@ -217,7 +217,10 @@
     border: 1px solid var(--line);
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  /* Transition только на десктопе — на мобиле бессмысленно и тормозит */
+  @media (hover: hover) and (min-width: 721px) {
+    .cell.letter { transition: background 0.15s, border-color 0.15s, transform 0.1s; }
   }
   .cell.letter:hover { border-color: var(--cyan-mid); }
   .cell.letter.highlight {
@@ -229,7 +232,10 @@
     border-color: var(--cyan);
     box-shadow: 0 0 0 2px var(--cyan), 0 0 14px rgba(0,229,255,0.5);
     z-index: 2;
-    transform: scale(1.06);
+  }
+  /* На десктопе можно позволить лёгкое масштабирование, на мобиле — нет (вызывает лаг при вводе) */
+  @media (hover: hover) and (min-width: 721px) {
+    .cell.letter.active { transform: scale(1.06); }
   }
   .cell.letter.solved {
     background: rgba(46,230,118,0.18);
@@ -1495,12 +1501,11 @@ function scrollActiveIntoView() {
   const cr = cell.el.getBoundingClientRect();
   const wr = wrap.getBoundingClientRect();
   const dx = cr.left + cr.width / 2 - (wr.left + wr.width / 2);
-  const dy = cr.top + cr.height / 2 - (wr.top + wr.height / 2);
-  // Гладко скроллим только board-wrap (внутренний)
+  // На мобильном — мгновенный скролл (smooth тормозит ввод). На десктопе — плавный.
+  const behavior = IS_MOBILE ? "auto" : "smooth";
   if (cr.left < wr.left + 20 || cr.right > wr.right - 20) {
-    wrap.scrollBy({ left: dx, behavior: "smooth" });
+    wrap.scrollBy({ left: dx, behavior });
   }
-  // На широком экране board-wrap прокручивается по странице, активная клетка может уйти под header — мягко скроллим окно
   if (window.innerWidth > 720) {
     if (cr.top < 80) window.scrollBy({ top: cr.top - 100, behavior: "smooth" });
     if (cr.bottom > window.innerHeight - 100) window.scrollBy({ top: cr.bottom - window.innerHeight + 120, behavior: "smooth" });
@@ -1654,16 +1659,25 @@ function stopTimer() {
 // ═══════════════════════════════════════════════════════════
 // SAVE / LOAD
 // ═══════════════════════════════════════════════════════════
+let _saveTimer = null;
 function save() {
+  // Дебаунс — пишем в localStorage не чаще раза в 400мс,
+  // иначе на iOS блокирующая запись тормозит ввод.
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(_saveNow, 400);
+}
+function _saveNow() {
+  _saveTimer = null;
   const data = {};
   for (const k in cells) {
     if (cells[k].input.value) data[k] = cells[k].input.value;
   }
-  localStorage.setItem(storageKey(), JSON.stringify({
-    cells: data,
-    startTime,
-  }));
+  try {
+    localStorage.setItem(storageKey(), JSON.stringify({ cells: data, startTime }));
+  } catch (e) {}
 }
+window.addEventListener("beforeunload", () => { if (_saveTimer) _saveNow(); });
+window.addEventListener("pagehide",     () => { if (_saveTimer) _saveNow(); });
 function load() {
   try {
     const raw = localStorage.getItem(storageKey());

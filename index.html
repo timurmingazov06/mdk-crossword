@@ -249,9 +249,7 @@
     caret-color: transparent;
     padding: 0;
   }
-  /* На мобильном input не ловит клики — иначе вылазит нативная клавиатура поверх нашей */
-  body.mobile-mode .cell .input { pointer-events: none; }
-  body.mobile-mode .cell.letter { cursor: pointer; }
+  /* На мобильном используем нативную клавиатуру iOS/Android — наша виртуальная скрыта */
   .cell .num {
     position: absolute; top: 1px; left: 2px;
     font-family: var(--mono); font-size: 9px;
@@ -421,17 +419,19 @@
   .btn.danger:hover { background: rgba(255,77,109,0.15); border-color: var(--red); color: var(--red); }
   .btn.warn:hover { background: rgba(255,176,0,0.15); border-color: var(--amber); color: var(--amber); }
 
-  /* ── Mobile bottom bar (sticky активный вопрос над клавиатурой) ── */
+  /* ── Mobile bottom bar (плавает над клавиатурой iOS/Android) ── */
   .mobile-bar {
     display: none;
     position: fixed; left: 0; right: 0;
-    bottom: var(--kbd-h, 168px);
-    background: linear-gradient(180deg, rgba(6,9,20,0.5), rgba(6,9,20,0.95));
+    bottom: var(--kbd-h, 0px);
+    transform: translateY(0);
+    background: linear-gradient(180deg, rgba(6,9,20,0.85), rgba(6,9,20,0.98));
     backdrop-filter: blur(14px);
     border-top: 1px solid var(--cyan);
-    padding: 10px 12px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
     z-index: 90;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(0,229,255,0.15);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.5), 0 0 20px rgba(0,229,255,0.15);
+    transition: bottom 0.15s ease;
   }
   .mobile-bar .row1 {
     display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
@@ -497,11 +497,11 @@
     .header-actions { display: flex; }
     .header-actions #btn-share, .header-actions #btn-print { display: none; }
     .header-actions .icon-btn { width: 36px; height: 36px; font-size: 16px; }
-    .keyboard { display: block; }
+    .keyboard { display: none !important; }
     .mobile-bar { display: block; }
     .active-strip { display: none; }
     .side { display: none; }
-    main { padding: 12px; padding-bottom: calc(var(--kbd-h, 168px) + 92px); gap: 14px; }
+    main { padding: 12px; padding-bottom: calc(var(--kbd-h, 0px) + 110px); gap: 14px; }
     .board-wrap { padding: 10px 8px 8px; border-radius: 12px; }
     .board-wrap::before { display: none; }
     .grid { padding: 8px 4px 4px; }
@@ -1284,9 +1284,17 @@ let timerInterval = null;
 // BUILD GRID
 // ═══════════════════════════════════════════════════════════
 // Определяем мобильный режим: узкий экран ИЛИ тач-устройство без мыши
-const IS_MOBILE = window.matchMedia("(max-width: 720px)").matches
-                  || ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches);
-if (IS_MOBILE) document.body.classList.add("mobile-mode");
+function detectMobile() {
+  return window.matchMedia("(max-width: 720px)").matches
+    || ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches);
+}
+let IS_MOBILE = detectMobile();
+function applyMobileClass() {
+  IS_MOBILE = detectMobile();
+  document.body.classList.toggle("mobile-mode", IS_MOBILE);
+}
+applyMobileClass();
+window.addEventListener("resize", applyMobileClass);
 
 function buildGrid() {
   const grid = document.getElementById("grid");
@@ -1309,12 +1317,9 @@ function buildGrid() {
         input.spellcheck = false;
         input.dataset.r = r;
         input.dataset.c = c;
-        // На мобильном — input readonly, чтобы не вылазила нативная клавиатура
-        if (IS_MOBILE) {
-          input.readOnly = true;
-          input.inputMode = "none";
-          input.tabIndex = -1;
-        }
+        // Используем нативную клавиатуру устройства (iOS/Android)
+        input.type = "text";
+        input.inputMode = "text";
         cell.appendChild(input);
         cells[`${r},${c}`] = { el: cell, input, letter, num: null };
       }
@@ -1812,11 +1817,21 @@ document.getElementById("next-word").addEventListener("click", () => nextWord(1)
 // MOBILE: bottom bar + modals + keyboard height var
 // ═══════════════════════════════════════════════════════════
 function updateKbdHeight() {
-  const kb = document.getElementById("keyboard");
-  const h = kb.offsetHeight || 0;
-  document.documentElement.style.setProperty("--kbd-h", h + "px");
+  // На мобильном следим за нативной клавиатурой через Visual Viewport API
+  if (IS_MOBILE && window.visualViewport) {
+    const vv = window.visualViewport;
+    const kbH = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    document.documentElement.style.setProperty("--kbd-h", kbH + "px");
+    return;
+  }
+  // На десктопе клавиатуры нет
+  document.documentElement.style.setProperty("--kbd-h", "0px");
 }
 window.addEventListener("resize", updateKbdHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", updateKbdHeight);
+  window.visualViewport.addEventListener("scroll", updateKbdHeight);
+}
 updateKbdHeight();
 
 // Mobile bottom bar buttons

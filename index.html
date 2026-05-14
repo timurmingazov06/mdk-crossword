@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>МДК 02.02 Транспорт — Кроссворд</title>
+<style>
+  :root {
+    --bg:        #060914;
+    --bg-2:      #0a1224;
+    --panel:     #0f1a30;
+    --panel-2:   #14213d;
+    --line:      rgba(0, 229, 255, 0.12);
+    --line-2:    rgba(0, 229, 255, 0.25);
+    --cyan:      #00e5ff;
+    --cyan-soft: rgba(0, 229, 255, 0.18);
+    --cyan-mid:  rgba(0, 229, 255, 0.45);
+    --amber:     #ffb000;
+    --magenta:   #ff2d92;
+    --green:     #2ee676;
+    --red:       #ff4d6d;
+    --text:      #d6e4ff;
+    --text-dim:  #6c7a99;
+    --mono:      "JetBrains Mono", "Menlo", "Monaco", "SF Mono", monospace;
+    --sans:      "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; }
+  html { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(0,229,255,0.06), transparent 70%),
+      radial-gradient(900px 500px at -10% 100%, rgba(255,45,146,0.05), transparent 70%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  /* ── Фоновая стилизация связи: тонкие сканирующие линии ── */
+  .scanlines::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(0,229,255,0.015) 3px 4px);
+    mix-blend-mode: screen;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(6,9,20,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 18px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; min-width: 0; }
+  .logo {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--cyan), var(--magenta));
+    display: grid; place-items: center;
+    box-shadow: 0 0 16px rgba(0,229,255,0.5);
+    font-family: var(--mono); color: #000; font-weight: 800; font-size: 16px;
+    flex: 0 0 auto;
+  }
+  .title { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+  .title .top { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--cyan); text-transform: uppercase; }
+  .title .main { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats { display: flex; gap: 14px; margin-left: auto; align-items: center; flex-wrap: nowrap; }
+  .stat {
+    display: flex; flex-direction: column; align-items: flex-end;
+    font-family: var(--mono); line-height: 1.1;
+  }
+  .stat .lab { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); }
+  .stat .val { font-size: 16px; color: var(--cyan); font-weight: 700; }
+  .progress-wrap {
+    width: 180px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .progress-bar {
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .header-actions { display: flex; gap: 6px; }
+  .header-actions .icon-btn {
+    width: 38px; height: 38px;
+    background: var(--panel-2); border: 1px solid var(--line-2);
+    border-radius: 8px; color: var(--cyan);
+    cursor: pointer; display: grid; place-items: center;
+    font-size: 18px; padding: 0;
+    position: relative;
+  }
+  .header-actions .icon-btn:hover { border-color: var(--cyan-mid); background: var(--cyan-soft); }
+  .header-actions .icon-btn:active { background: var(--cyan-soft); }
+  .header-actions .icon-btn.off { opacity: 0.45; }
+  /* ── WDM Spectrum animated stripe внизу страницы ── */
+  .wdm-stripe {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      #ff1844 0%, #ff6f00 14%, #ffd600 28%, #2eff00 42%,
+      #00e5ff 56%, #4d6dff 70%, #b400ff 84%, #ff1844 100%);
+    background-size: 200% 100%;
+    animation: wdmflow 8s linear infinite;
+    z-index: 70;
+    box-shadow: 0 0 10px rgba(0,229,255,0.3);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  @keyframes wdmflow {
+    from { background-position: 0% 0; }
+    to   { background-position: -200% 0; }
+  }
+
+  /* Print styles */
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    html, body { background: white !important; color: black !important; }
+    header, .header-actions, .keyboard, .mobile-bar, .modal, .modal-backdrop,
+    .wdm-stripe, .active-strip, .finish-overlay, .toast, .side .panel:nth-child(3) /* управление */,
+    #btn-check, #btn-hint, #btn-reveal, #btn-clear, .nav-btns { display: none !important; }
+    main { display: block !important; padding: 0 !important; max-width: 100% !important; }
+    .board-wrap {
+      background: white !important;
+      border: 1px solid #000 !important;
+      padding: 8px !important;
+      page-break-after: avoid;
+      overflow: visible !important;
+    }
+    .board-wrap::before { content: "Вариант " attr(data-variant); position: static !important; color: #000 !important; font-size: 12pt; display: block; margin-bottom: 8px; }
+    .grid { width: max-content; margin: 0 auto; gap: 1px; background: none !important; }
+    :root { --cell: 28px; }
+    .cell.letter {
+      background: white !important;
+      border: 1px solid #000 !important;
+      border-radius: 0 !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .cell .input {
+      color: transparent !important; /* печатаем БЕЗ ответов */
+      caret-color: transparent !important;
+    }
+    body[data-print="answers"] .cell .input { color: #000 !important; }
+    .cell.empty { background: white !important; }
+    .cell .num { color: #000 !important; text-shadow: none !important; font-size: 8pt !important; }
+    .cell .start-h::after, .cell .start-v::after { display: none !important; }
+    .cell.highlight, .cell.active, .cell.solved { background: white !important; border-color: #000 !important; box-shadow: none !important; }
+    .side {
+      display: block !important;
+      page-break-before: always;
+      max-width: 100% !important;
+    }
+    .side .panel {
+      background: white !important;
+      border: 1px solid #000 !important;
+      border-radius: 0 !important;
+      padding: 8px !important;
+      margin-bottom: 8px !important;
+      page-break-inside: avoid;
+    }
+    .panel-title { color: #000 !important; }
+    .panel-title::before { background: #000 !important; box-shadow: none !important; }
+    .clue-item { background: white !important; border: 0 !important; padding: 4px 0 !important; }
+    .clue-item .num { color: #000 !important; }
+    .clue-item .text { color: #000 !important; font-size: 11pt !important; line-height: 1.3 !important; }
+    .clue-item .len { color: #555 !important; }
+  }
+
+  /* ── Layout ── */
+  main {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  /* ── Crossword board ── */
+  .board-wrap {
+    background: linear-gradient(180deg, rgba(15,26,48,0.6), rgba(10,18,36,0.6));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    overflow: auto;
+    position: relative;
+  }
+  .board-wrap::before {
+    content: "TRANSPORT.GRID";
+    position: absolute; top: 8px; right: 14px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+    color: var(--text-dim);
+  }
+  .grid {
+    display: grid;
+    gap: 2px;
+    width: max-content;
+    margin: 0 auto;
+    padding: 14px 8px 8px 8px;
+    background:
+      linear-gradient(to right, var(--line-2) 1px, transparent 1px) 0 0 / 100% 1px no-repeat,
+      linear-gradient(to bottom, var(--line-2) 1px, transparent 1px) 0 0 / 1px 100% no-repeat;
+  }
+  .cell {
+    position: relative;
+    width: var(--cell, 34px);
+    height: var(--cell, 34px);
+    background: transparent;
+  }
+  .cell.empty { background: transparent; }
+  .cell.letter {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .cell.letter:hover { border-color: var(--cyan-mid); }
+  .cell.letter.highlight {
+    background: var(--cyan-soft);
+    border-color: var(--cyan-mid);
+  }
+  .cell.letter.active {
+    background: rgba(0,229,255,0.32);
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 2px var(--cyan), 0 0 14px rgba(0,229,255,0.5);
+    z-index: 2;
+    transform: scale(1.06);
+  }
+  .cell.letter.solved {
+    background: rgba(46,230,118,0.18);
+    border-color: rgba(46,230,118,0.5);
+  }
+  .cell.letter.solved .input { color: var(--green); }
+  .cell.letter.wrong { animation: shake 0.4s; }
+  .cell .input {
+    position: absolute; inset: 0;
+    background: transparent; border: 0; outline: none;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: calc(var(--cell, 34px) * 0.5);
+    font-weight: 700;
+    color: var(--cyan);
+    text-transform: uppercase;
+    caret-color: transparent;
+    padding: 0;
+  }
+  .cell .num {
+    position: absolute; top: 1px; left: 2px;
+    font-family: var(--mono); font-size: 9px;
+    color: var(--amber);
+    line-height: 1;
+    pointer-events: none;
+    text-shadow: 0 0 2px rgba(0,0,0,0.8);
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  /* ── Active clue strip (sticky под сеткой на десктопе) ── */
+  .active-strip {
+    position: sticky;
+    bottom: 12px;
+    margin-top: 16px;
+    background: linear-gradient(90deg, rgba(0,229,255,0.18), rgba(255,45,146,0.10));
+    border: 1px solid var(--cyan);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 24px rgba(0,229,255,0.2);
+    z-index: 5;
+  }
+  .active-strip .badge {
+    background: var(--cyan); color: #000;
+    font-family: var(--mono); font-weight: 800;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 12px; letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .active-strip .clue-text {
+    flex: 1; min-width: 200px;
+    font-size: 15px; line-height: 1.4; color: var(--text);
+  }
+  .active-strip .nav-btns { display: flex; gap: 6px; }
+  .nav-btn {
+    background: transparent; border: 1px solid var(--line-2);
+    color: var(--cyan); width: 32px; height: 32px;
+    border-radius: 6px; cursor: pointer;
+    display: grid; place-items: center;
+    font-size: 16px; font-family: var(--mono);
+    transition: background 0.15s;
+  }
+  .nav-btn:hover { background: var(--cyan-soft); }
+
+  /* ── Modal (для вопросов и управления на мобильном) ── */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 180;
+    background: rgba(6,9,20,0.85); backdrop-filter: blur(10px);
+    display: none;
+  }
+  .modal-backdrop.show { display: block; animation: fadein 0.2s; }
+  .modal {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border-top: 1px solid var(--cyan-mid);
+    border-radius: 18px 18px 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+    z-index: 190;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+    padding: 14px 16px 24px;
+    box-shadow: 0 -16px 48px rgba(0,0,0,0.6), 0 0 32px rgba(0,229,255,0.15);
+  }
+  .modal.show { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--line-2); border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+  .modal-title {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .modal-title h3 {
+    margin: 0; font-size: 16px; color: var(--cyan);
+    font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .modal-close {
+    background: transparent; border: 0; color: var(--text-dim);
+    font-size: 22px; cursor: pointer; padding: 4px 8px;
+  }
+  .modal-tabs {
+    display: flex; gap: 4px; margin-bottom: 12px;
+    background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px;
+  }
+  .modal-tab {
+    flex: 1; padding: 8px; background: transparent; border: 0;
+    color: var(--text-dim); font-family: var(--sans); font-size: 13px;
+    border-radius: 6px; cursor: pointer; font-weight: 600;
+  }
+  .modal-tab.active { background: var(--cyan-soft); color: var(--cyan); }
+
+  /* ── Side panel ── */
+  .side {
+    display: flex; flex-direction: column; gap: 18px;
+    min-width: 0;
+  }
+  .panel {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .panel-title {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 12px;
+  }
+  .panel-title::before {
+    content: ""; width: 6px; height: 6px; background: var(--cyan);
+    border-radius: 50%; box-shadow: 0 0 6px var(--cyan);
+  }
+  .clue-list { display: flex; flex-direction: column; gap: 6px; }
+  .clue-item {
+    display: grid; grid-template-columns: 32px 1fr auto; gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    align-items: start;
+  }
+  .clue-item:hover { background: rgba(0,229,255,0.05); border-color: var(--line); }
+  .clue-item.active {
+    background: var(--cyan-soft);
+    border-color: var(--cyan-mid);
+  }
+  .clue-item.solved { opacity: 0.55; }
+  .clue-item .num {
+    font-family: var(--mono); font-weight: 700;
+    color: var(--amber); font-size: 14px; text-align: right;
+  }
+  .clue-item .text { font-size: 13px; line-height: 1.35; }
+  .clue-item .len {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim);
+  }
+  .clue-item.solved .text { color: var(--green); text-decoration: line-through; text-decoration-color: rgba(46,230,118,0.4); }
+
+  /* ── Controls ── */
+  .controls {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+  }
+  .btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line-2);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: var(--sans); font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn:hover { background: var(--cyan-soft); border-color: var(--cyan-mid); color: var(--cyan); }
+  .btn.primary { background: var(--cyan); color: #000; border-color: var(--cyan); font-weight: 700; }
+  .btn.primary:hover { background: #5cf; color: #000; }
+  .btn.danger:hover { background: rgba(255,77,109,0.15); border-color: var(--red); color: var(--red); }
+  .btn.warn:hover { background: rgba(255,176,0,0.15); border-color: var(--amber); color: var(--amber); }
+
+  /* ── Mobile bottom bar (sticky активный вопрос над клавиатурой) ── */
+  .mobile-bar {
+    display: none;
+    position: fixed; left: 0; right: 0;
+    bottom: var(--kbd-h, 168px);
+    background: linear-gradient(180deg, rgba(6,9,20,0.5), rgba(6,9,20,0.95));
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--cyan);
+    padding: 10px 12px;
+    z-index: 90;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(0,229,255,0.15);
+  }
+  .mobile-bar .row1 {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .mobile-bar .badge {
+    background: var(--cyan); color: #000;
+    font-family: var(--mono); font-weight: 800;
+    padding: 4px 8px; border-radius: 6px;
+    font-size: 11px; letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .mobile-bar .nav-btn-m {
+    width: 32px; height: 32px;
+    background: var(--panel-2); border: 1px solid var(--line-2);
+    border-radius: 6px; color: var(--cyan);
+    cursor: pointer; display: grid; place-items: center;
+    font-size: 14px;
+  }
+  .mobile-bar .nav-btn-m:active { background: var(--cyan-soft); }
+  .mobile-bar .text {
+    font-size: 13px; line-height: 1.35; color: var(--text);
+    max-height: 70px; overflow-y: auto;
+  }
+
+  /* ── Virtual keyboard (mobile) ── */
+  .keyboard {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(6,9,20,0.96); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line-2);
+    padding: 6px 4px calc(8px + env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+  .kbd-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 5px; }
+  .key {
+    flex: 1; min-width: 0;
+    max-width: 36px;
+    height: 42px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--mono); font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    display: grid; place-items: center;
+    padding: 0;
+  }
+  .key:active { background: var(--cyan-soft); border-color: var(--cyan); }
+  .key.wide { max-width: none; flex: 1.6; font-size: 13px; }
+  .key.special { color: var(--cyan); }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; padding: 14px; }
+  }
+  @media (max-width: 720px) {
+    header { padding: 10px 12px; gap: 10px; }
+    .title .top { display: none; }
+    .title .main { font-size: 14px; }
+    .stat .lab { display: none; }
+    .progress-wrap { display: none; }
+    .stats { gap: 8px; }
+    .header-actions { display: flex; }
+    .header-actions #btn-share, .header-actions #btn-print { display: none; }
+    .header-actions .icon-btn { width: 36px; height: 36px; font-size: 16px; }
+    .keyboard { display: block; }
+    .mobile-bar { display: block; }
+    .active-strip { display: none; }
+    .side { display: none; }
+    main { padding: 12px; padding-bottom: calc(var(--kbd-h, 168px) + 92px); gap: 14px; }
+    .board-wrap { padding: 10px 8px 8px; border-radius: 12px; }
+    .board-wrap::before { display: none; }
+    .grid { padding: 8px 4px 4px; }
+  }
+  @media (max-width: 380px) {
+    .key { height: 38px; font-size: 14px; }
+  }
+
+  /* ── Завершение ── */
+  .finish-overlay {
+    position: fixed; inset: 0;
+    background: rgba(6,9,20,0.92); backdrop-filter: blur(8px);
+    display: none; place-items: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .finish-overlay.show { display: grid; animation: fadein 0.6s; }
+  .finish-card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--cyan-mid);
+    border-radius: 16px;
+    padding: 36px 32px;
+    max-width: 460px; text-align: center;
+    box-shadow: 0 0 60px rgba(0,229,255,0.3);
+  }
+  .finish-card h2 {
+    color: var(--cyan); margin: 0 0 12px; font-size: 28px;
+    text-shadow: 0 0 12px rgba(0,229,255,0.6);
+  }
+  .finish-card p { color: var(--text-dim); margin: 0 0 20px; line-height: 1.5; }
+  .finish-card .time { font-family: var(--mono); font-size: 32px; color: var(--amber); margin: 16px 0; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ── Responsive cell sizing ── */
+  @media (max-width: 1280px) { :root { --cell: 30px; } .cell .input { font-size: 15px; } }
+  @media (max-width: 900px)  { :root { --cell: 30px; } .cell .input { font-size: 15px; } .cell .num { font-size: 9px; } }
+  @media (max-width: 720px)  { :root { --cell: 32px; } .cell .input { font-size: 16px; } .cell .num { font-size: 10px; } }
+  @media (max-width: 380px)  { :root { --cell: 30px; } .cell .input { font-size: 15px; } }
+
+  /* ── Стрелочка-индикатор направления ── */
+  .cell.start-h::after, .cell.start-v::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .cell.start-h.active::after {
+    opacity: 1;
+    right: 1px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid var(--cyan);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+  .cell.start-v.active::after {
+    opacity: 1;
+    bottom: 1px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-top: 5px solid var(--cyan);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--panel-2); border: 1px solid var(--line-2);
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 13px;
+    opacity: 0; transition: all 0.3s;
+    z-index: 150;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body class="scanlines">
+
+<header>
+  <div class="brand">
+    <div class="logo">Т</div>
+    <div class="title">
+      <span class="top">МДК 02.02 · TRANSPORT</span>
+      <span class="main">Кроссворд · транспортные сети</span>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <span class="lab">Прогресс</span>
+      <span class="val"><span id="solved">0</span>/15</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+    <div class="stat">
+      <span class="lab">Таймер</span>
+      <span class="val" id="timer">00:00</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btn-sound" title="Звук">🔊</button>
+    <button class="icon-btn" id="btn-share" title="Поделиться результатом" aria-label="Поделиться">📷</button>
+    <button class="icon-btn" id="btn-print" title="Печать (для раздачи ученикам)" aria-label="Печать">🖨</button>
+    <button class="icon-btn" id="open-clues" title="Список вопросов" aria-label="Вопросы">☰</button>
+    <button class="icon-btn" id="open-tools" title="Управление" aria-label="Управление">⚙</button>
+  </div>
+</header>
+<div class="wdm-stripe" aria-hidden="true"></div>
+
+<main>
+  <section class="board-wrap">
+    <div class="grid" id="grid"></div>
+    <div class="active-strip" id="active-strip">
+      <span class="badge" id="active-badge">— · —</span>
+      <span class="clue-text" id="active-clue">Нажмите на клетку с цифрой, чтобы начать.</span>
+      <div class="nav-btns">
+        <button class="nav-btn" id="prev-word" title="Предыдущее слово">◀</button>
+        <button class="nav-btn" id="next-word" title="Следующее слово">▶</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="panel">
+      <div class="panel-title">По горизонтали</div>
+      <div class="clue-list" id="clues-h"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">По вертикали</div>
+      <div class="clue-list" id="clues-v"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Управление</div>
+      <div class="controls">
+        <button class="btn primary" id="btn-check">Проверить</button>
+        <button class="btn warn" id="btn-hint">Подсказка (1 буква)</button>
+        <button class="btn" id="btn-reveal">Открыть слово</button>
+        <button class="btn danger" id="btn-clear">Сбросить</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- Мобильная нижняя панель с активным вопросом -->
+<div class="mobile-bar" id="mobile-bar">
+  <div class="row1">
+    <span class="badge" id="mbar-badge">— · —</span>
+    <button class="nav-btn-m" id="mbar-prev">◀</button>
+    <button class="nav-btn-m" id="mbar-next">▶</button>
+    <button class="nav-btn-m" id="mbar-hint" title="Подсказка">💡</button>
+  </div>
+  <div class="text" id="mbar-text">Нажмите на клетку, чтобы начать.</div>
+</div>
+
+<div class="keyboard" id="keyboard"></div>
+
+<!-- Модалка: вопросы (мобильный) -->
+<div class="modal-backdrop" id="modal-backdrop"></div>
+<div class="modal" id="modal-clues">
+  <div class="modal-handle"></div>
+  <div class="modal-title">
+    <h3>Вопросы</h3>
+    <button class="modal-close" data-close>✕</button>
+  </div>
+  <div class="modal-tabs">
+    <button class="modal-tab active" data-tab="h">По горизонтали</button>
+    <button class="modal-tab" data-tab="v">По вертикали</button>
+  </div>
+  <div class="clue-list" id="modal-clues-h"></div>
+  <div class="clue-list" id="modal-clues-v" style="display:none"></div>
+</div>
+
+<!-- Модалка: управление (мобильный) -->
+<div class="modal" id="modal-tools">
+  <div class="modal-handle"></div>
+  <div class="modal-title">
+    <h3>Управление</h3>
+    <button class="modal-close" data-close>✕</button>
+  </div>
+  <div class="controls">
+    <button class="btn primary" data-act="check">Проверить</button>
+    <button class="btn warn" data-act="hint">Подсказка (1 буква)</button>
+    <button class="btn" data-act="reveal">Открыть слово</button>
+    <button class="btn" data-act="share">📷 Поделиться</button>
+    <button class="btn" data-act="print">🖨 Печать</button>
+    <button class="btn danger" data-act="clear">Сбросить всё</button>
+  </div>
+</div>
+
+<div class="finish-overlay" id="finish">
+  <div class="finish-card">
+    <h2>Канал установлен ✓</h2>
+    <p>Все 15 терминов транспортной сети успешно идентифицированы. Линия в норме, ошибок нет.</p>
+    <div class="time" id="finish-time">00:00</div>
+    <button class="btn primary" onclick="document.getElementById('finish').classList.remove('show')">Закрыть</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const DATA = {
+  "rows": 18,
+  "cols": 22,
+  "grid": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "С",
+      "В",
+      "Е",
+      "Р",
+      "Х",
+      "Ц",
+      "И",
+      "К",
+      "Л",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "С",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "В",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "И",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "А",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Н",
+      null,
+      null,
+      null,
+      "Д",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "К",
+      "О",
+      "Н",
+      "Т",
+      "Е",
+      "Й",
+      "Н",
+      "Е",
+      "Р"
+    ],
+    [
+      null,
+      "Х",
+      null,
+      null,
+      null,
+      "Е",
+      null,
+      "В",
+      null,
+      null,
+      "Ц",
+      null,
+      null,
+      null,
+      null,
+      "Т",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Р",
+      null,
+      null,
+      null,
+      "К",
+      null,
+      "С",
+      null,
+      null,
+      "И",
+      null,
+      null,
+      null,
+      null,
+      "О",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "К",
+      "О",
+      "Л",
+      "Ь",
+      "Ц",
+      "О",
+      null,
+      "Т",
+      "Р",
+      "А",
+      "К",
+      "Т",
+      null,
+      null,
+      null,
+      "В",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "С",
+      null,
+      null,
+      null,
+      "Д",
+      null,
+      "А",
+      null,
+      null,
+      "Л",
+      null,
+      null,
+      null,
+      null,
+      "А",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "И",
+      null,
+      null,
+      null,
+      "Е",
+      null,
+      "В",
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Л",
+      null,
+      "Н",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Г",
+      null,
+      null,
+      null,
+      "Р",
+      "Е",
+      "К",
+      "О",
+      "М",
+      "Б",
+      "И",
+      "Н",
+      "А",
+      "Ц",
+      "И",
+      "Я",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Н",
+      null,
+      null,
+      null,
+      null,
+      null,
+      "А",
+      null,
+      "Е",
+      null,
+      "Н",
+      null,
+      "З",
+      null,
+      "Е",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "А",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Т",
+      null,
+      "Т",
+      null,
+      "Е",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Л",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "К",
+      null,
+      "Е",
+      null,
+      "Р",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "А",
+      null,
+      "Р",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Ф",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "К",
+      "О",
+      "Д",
+      "И",
+      "Р",
+      "О",
+      "В",
+      "А",
+      "Н",
+      "И",
+      "Е",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Й",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Т",
+      "А",
+      "Й",
+      "М",
+      "С",
+      "Л",
+      "О",
+      "Т",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "words": [
+    {
+      "word": "РЕКОМБИНАЦИЯ",
+      "clue": "Процесс соединения электронов и дырок в активном слое СИД, сопровождающийся излучением света. (Слайд 174)",
+      "row": 9,
+      "col": 5,
+      "dir": "h"
+    },
+    {
+      "word": "ВСТАВКА",
+      "clue": "Фиксированная остановка аппаратуры, во время которой в этот момент ничего не передаётся. (Слайд 118)",
+      "row": 4,
+      "col": 7,
+      "dir": "v"
+    },
+    {
+      "word": "ДЕКОДЕР",
+      "clue": "Устройство для преобразования 8-разрядных кодовых комбинаций в амплитудные значения группового АИМ-сигнала. (Слайд 18)",
+      "row": 3,
+      "col": 5,
+      "dir": "v"
+    },
+    {
+      "word": "ЛАЗЕР",
+      "clue": "Устройство, усиливающее вынужденное излучение активной среды. (Слайд 168)",
+      "row": 8,
+      "col": 13,
+      "dir": "v"
+    },
+    {
+      "word": "КОЛЬЦО",
+      "clue": "Топология SDH-сети, основное преимущество которой — лёгкость организации защиты типа 1+1. (Слайд 87)",
+      "row": 6,
+      "col": 0,
+      "dir": "h"
+    },
+    {
+      "word": "МЕТКА",
+      "clue": "Значение от 0 до 1 048 575, на основе которого LSR в сети MPLS принимает решение, что делать с пакетом. (Слайд 221)",
+      "row": 9,
+      "col": 9,
+      "dir": "v"
+    },
+    {
+      "word": "ИНТЕРФЕЙС",
+      "clue": "Определённая стандартами граница взаимодействия различных устройств, представленная аппаратно-программными средствами. (Слайд 32)",
+      "row": 9,
+      "col": 11,
+      "dir": "v"
+    },
+    {
+      "word": "ТРАКТ",
+      "clue": "Логическое соединение между точкой, в которой собирается виртуальный контейнер VC, и точкой, в которой он разбирается. (Слайд 37)",
+      "row": 6,
+      "col": 7,
+      "dir": "h"
+    },
+    {
+      "word": "КВАНТОВАНИЕ",
+      "clue": "Преобразование дискретных отсчётов сигнала в ближайшие разрешённые уровни. (Слайд 8)",
+      "row": 0,
+      "col": 15,
+      "dir": "v"
+    },
+    {
+      "word": "СИНХРОСИГНАЛ",
+      "clue": "Импульс, отличающийся от импульсов канальных интервалов; определяет начало цикла и обеспечивает правильное распределение дискретных отсчётов по каналам. (Слайд 6)",
+      "row": 1,
+      "col": 1,
+      "dir": "v"
+    },
+    {
+      "word": "КОДИРОВАНИЕ",
+      "clue": "Преобразование квантованных отсчётов в соответствующие кодовые комбинации. (Слайд 8)",
+      "row": 15,
+      "col": 1,
+      "dir": "h"
+    },
+    {
+      "word": "КОНТЕЙНЕР",
+      "clue": "Циклически повторяющаяся информационная структура, предназначенная для транспортировки в сети SDH стандартных цифровых потоков PDH. (Слайд 37)",
+      "row": 3,
+      "col": 13,
+      "dir": "h"
+    },
+    {
+      "word": "ТАЙМСЛОТ",
+      "clue": "Канальный интервал длительностью 3,906 мкс — один из 32 в цикле ИКМ-30. (Слайд 46)",
+      "row": 17,
+      "col": 7,
+      "dir": "h"
+    },
+    {
+      "word": "ЦИКЛ",
+      "clue": "Время, в течение которого однократно передаются все канальные интервалы объединённых каналов и синхросигнал. (Слайд 6)",
+      "row": 4,
+      "col": 10,
+      "dir": "v"
+    },
+    {
+      "word": "СВЕРХЦИКЛ",
+      "clue": "Минимальный интервал времени, за который передаётся один отсчёт каждого из 60 сигнальных каналов. (Слайд 46)",
+      "row": 0,
+      "col": 8,
+      "dir": "h"
+    }
+  ]
+};
+
+function storageKey() { return "mdk_crossword_final"; }
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let cells = {};       // key "r,c" -> {el, input, letter, num}
+let words = [];       // [{word, clue, dir, cells:[{r,c}], num, solved}]
+let activeWord = null;
+let activeCellIdx = 0;
+let startTime = null;
+let timerInterval = null;
+
+// ═══════════════════════════════════════════════════════════
+// BUILD GRID
+// ═══════════════════════════════════════════════════════════
+function buildGrid() {
+  const grid = document.getElementById("grid");
+  grid.style.gridTemplateColumns = `repeat(${DATA.cols}, var(--cell, 34px))`;
+  grid.style.gridTemplateRows = `repeat(${DATA.rows}, var(--cell, 34px))`;
+
+  for (let r = 0; r < DATA.rows; r++) {
+    for (let c = 0; c < DATA.cols; c++) {
+      const letter = DATA.grid[r][c];
+      const cell = document.createElement("div");
+      cell.className = "cell" + (letter ? " letter" : " empty");
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      if (letter) {
+        const input = document.createElement("input");
+        input.className = "input";
+        input.maxLength = 1;
+        input.autocomplete = "off";
+        input.autocapitalize = "characters";
+        input.spellcheck = false;
+        input.dataset.r = r;
+        input.dataset.c = c;
+        cell.appendChild(input);
+        cells[`${r},${c}`] = { el: cell, input, letter, num: null };
+      }
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// NUMBER & WIRE WORDS
+// ═══════════════════════════════════════════════════════════
+function numberAndWire() {
+  // Сортировка слов: левый-верх → правый-низ. Слова, начинающиеся в одной клетке, получают один номер.
+  const wordsRaw = DATA.words.map(w => ({
+    ...w,
+    cells: Array.from({ length: w.word.length }, (_, i) => ({
+      r: w.dir === "h" ? w.row : w.row + i,
+      c: w.dir === "h" ? w.col + i : w.col,
+    })),
+    solved: false,
+  }));
+
+  // Сортировка по (row, col)
+  wordsRaw.sort((a, b) => a.row - b.row || a.col - b.col);
+
+  // Группируем по стартовой клетке
+  const numByStart = {};
+  let num = 0;
+  for (const w of wordsRaw) {
+    const key = `${w.row},${w.col}`;
+    if (!(key in numByStart)) {
+      num++;
+      numByStart[key] = num;
+    }
+    w.num = numByStart[key];
+  }
+
+  // Расставим номера в клетках
+  for (const w of wordsRaw) {
+    const startCell = cells[`${w.row},${w.col}`];
+    if (startCell && !startCell.num) {
+      startCell.num = w.num;
+      const numEl = document.createElement("span");
+      numEl.className = "num";
+      numEl.textContent = w.num;
+      startCell.el.appendChild(numEl);
+    }
+    // Метим клетку признаком направления
+    startCell.el.classList.add(w.dir === "h" ? "start-h" : "start-v");
+  }
+
+  words = wordsRaw;
+
+  // Сортируем для боковых панелей: сначала по номеру
+  const byNum = [...words].sort((a, b) => a.num - b.num);
+  const hList = document.getElementById("clues-h");
+  const vList = document.getElementById("clues-v");
+  const mhList = document.getElementById("modal-clues-h");
+  const mvList = document.getElementById("modal-clues-v");
+  for (const w of byNum) {
+    w.listItems = [];
+    for (const list of [w.dir === "h" ? hList : vList, w.dir === "h" ? mhList : mvList]) {
+      const item = document.createElement("div");
+      item.className = "clue-item";
+      item.dataset.word = w.word;
+      item.dataset.dir = w.dir;
+      item.innerHTML = `
+        <span class="num">${w.num}</span>
+        <span class="text">${w.clue}</span>
+        <span class="len">${w.word.length}</span>
+      `;
+      item.addEventListener("click", () => {
+        selectWord(w);
+        closeModals();
+      });
+      list.appendChild(item);
+      w.listItems.push(item);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CELL CLICK / NAV
+// ═══════════════════════════════════════════════════════════
+function attachCellHandlers() {
+  for (const key in cells) {
+    const c = cells[key];
+    c.el.addEventListener("click", () => onCellClick(c));
+    c.input.addEventListener("focus", () => onCellClick(c, true));
+    c.input.addEventListener("input", (e) => onInput(c, e));
+    c.input.addEventListener("keydown", (e) => onKeyDown(c, e));
+  }
+}
+
+function onCellClick(cell, fromFocus) {
+  const r = +cell.input.dataset.r, c = +cell.input.dataset.c;
+  // Найти все слова, проходящие через эту клетку
+  const here = words.filter(w => w.cells.some(p => p.r === r && p.c === c));
+  if (!here.length) return;
+  let chosen = activeWord && here.includes(activeWord) ? activeWord : here[0];
+  // Повторный клик — переключение направления
+  if (!fromFocus && activeWord && here.length > 1 && here.includes(activeWord)) {
+    chosen = here.find(w => w !== activeWord) || activeWord;
+  }
+  selectWord(chosen, { r, c });
+}
+
+function selectWord(w, focusAt) {
+  activeWord = w;
+  // index клетки для фокуса
+  let idx = 0;
+  if (focusAt) {
+    idx = w.cells.findIndex(p => p.r === focusAt.r && p.c === focusAt.c);
+    if (idx < 0) idx = 0;
+  } else {
+    // Первая пустая клетка
+    idx = w.cells.findIndex(p => !cells[`${p.r},${p.c}`].input.value);
+    if (idx < 0) idx = 0;
+  }
+  activeCellIdx = idx;
+  render();
+  focusActive();
+  scrollActiveIntoView();
+}
+
+function focusActive() {
+  if (!activeWord) return;
+  const p = activeWord.cells[activeCellIdx];
+  const c = cells[`${p.r},${p.c}`];
+  c.input.focus({ preventScroll: false });
+  c.input.select();
+}
+
+function render() {
+  // снять подсветки
+  for (const k in cells) {
+    cells[k].el.classList.remove("highlight", "active");
+  }
+  document.querySelectorAll(".clue-item").forEach(i => i.classList.remove("active"));
+  // подсветить активное слово
+  if (activeWord) {
+    for (let i = 0; i < activeWord.cells.length; i++) {
+      const p = activeWord.cells[i];
+      cells[`${p.r},${p.c}`].el.classList.add("highlight");
+      if (i === activeCellIdx) cells[`${p.r},${p.c}`].el.classList.add("active");
+    }
+    // в обоих списках (sidebar и модалка) ищем элементы этого слова
+    for (const item of activeWord.listItems || []) item.classList.add("active");
+    const dirLabel = activeWord.dir === "h" ? "ПО ГОРИЗОНТАЛИ" : "ПО ВЕРТИКАЛИ";
+    const badge = `${activeWord.num} · ${dirLabel} · ${activeWord.word.length}`;
+    document.getElementById("active-badge").textContent = badge;
+    document.getElementById("active-clue").textContent = activeWord.clue;
+    const mb = document.getElementById("mbar-badge");
+    const mt = document.getElementById("mbar-text");
+    if (mb) mb.textContent = badge;
+    if (mt) mt.textContent = activeWord.clue;
+  }
+  // прогресс
+  const solvedCount = words.filter(w => w.solved).length;
+  document.getElementById("solved").textContent = solvedCount;
+  document.getElementById("progress").style.width = (solvedCount / words.length * 100) + "%";
+}
+
+function scrollActiveIntoView() {
+  if (!activeWord) return;
+  const p = activeWord.cells[activeCellIdx];
+  const cell = cells[`${p.r},${p.c}`];
+  if (!cell) return;
+  const wrap = document.querySelector(".board-wrap");
+  const cr = cell.el.getBoundingClientRect();
+  const wr = wrap.getBoundingClientRect();
+  const dx = cr.left + cr.width / 2 - (wr.left + wr.width / 2);
+  const dy = cr.top + cr.height / 2 - (wr.top + wr.height / 2);
+  // Гладко скроллим только board-wrap (внутренний)
+  if (cr.left < wr.left + 20 || cr.right > wr.right - 20) {
+    wrap.scrollBy({ left: dx, behavior: "smooth" });
+  }
+  // На широком экране board-wrap прокручивается по странице, активная клетка может уйти под header — мягко скроллим окно
+  if (window.innerWidth > 720) {
+    if (cr.top < 80) window.scrollBy({ top: cr.top - 100, behavior: "smooth" });
+    if (cr.bottom > window.innerHeight - 100) window.scrollBy({ top: cr.bottom - window.innerHeight + 120, behavior: "smooth" });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INPUT HANDLING
+// ═══════════════════════════════════════════════════════════
+function onInput(cell, e) {
+  let v = e.target.value.toUpperCase();
+  // Только кириллица + Ё/Й и т.п.
+  v = v.replace(/[^А-ЯЁ]/gi, "").slice(-1).toUpperCase();
+  e.target.value = v;
+  if (v) {
+    advanceCursor();
+  }
+  checkWord();
+  save();
+}
+
+function onKeyDown(cell, e) {
+  const r = +cell.input.dataset.r, c = +cell.input.dataset.c;
+  if (e.key === "Backspace") {
+    if (!cell.input.value) {
+      e.preventDefault();
+      retreatCursor();
+    } else {
+      // Стандартная очистка
+      setTimeout(() => { checkWord(); save(); }, 0);
+    }
+    return;
+  }
+  if (e.key === "Delete") {
+    cell.input.value = ""; checkWord(); save();
+    return;
+  }
+  if (e.key === "ArrowRight") { e.preventDefault(); moveTo(r, c + 1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); moveTo(r, c - 1); }
+  else if (e.key === "ArrowDown") { e.preventDefault(); moveTo(r + 1, c); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); moveTo(r - 1, c); }
+  else if (e.key === "Tab") {
+    e.preventDefault();
+    nextWord(e.shiftKey ? -1 : 1);
+  }
+  else if (e.key === "Enter") {
+    e.preventDefault();
+    nextWord(1);
+  }
+  else if (e.key === " ") {
+    e.preventDefault();
+    // переключить направление если есть второе слово через эту клетку
+    const here = words.filter(w => w.cells.some(p => p.r === r && p.c === c));
+    if (here.length > 1) {
+      const other = here.find(w => w !== activeWord);
+      if (other) selectWord(other, { r, c });
+    }
+  }
+}
+
+function advanceCursor() {
+  if (!activeWord) return;
+  if (activeCellIdx < activeWord.cells.length - 1) {
+    activeCellIdx++;
+    render(); focusActive();
+  }
+}
+function retreatCursor() {
+  if (!activeWord) return;
+  if (activeCellIdx > 0) {
+    activeCellIdx--;
+    // очистим букву на предыдущей клетке
+    const p = activeWord.cells[activeCellIdx];
+    cells[`${p.r},${p.c}`].input.value = "";
+    checkWord(); save();
+    render(); focusActive();
+  }
+}
+function moveTo(r, c) {
+  const k = `${r},${c}`;
+  if (cells[k]) {
+    // Найти слово, в котором есть эта клетка, в текущем направлении (если возможно)
+    const here = words.filter(w => w.cells.some(p => p.r === r && p.c === c));
+    if (!here.length) return;
+    let target = here.find(w => w.dir === (activeWord && activeWord.dir)) || here[0];
+    selectWord(target, { r, c });
+  }
+}
+function nextWord(dir) {
+  if (!words.length) return;
+  const sorted = [...words].sort((a, b) => a.num - b.num);
+  let idx = sorted.indexOf(activeWord);
+  if (idx < 0) idx = 0;
+  let n = sorted.length;
+  for (let step = 1; step <= n; step++) {
+    const next = sorted[(idx + step * dir + n) % n];
+    if (!next.solved) { selectWord(next); return; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHECK WORD
+// ═══════════════════════════════════════════════════════════
+function checkWord() {
+  for (const w of words) {
+    const guess = w.cells.map(p => cells[`${p.r},${p.c}`].input.value || "").join("");
+    if (guess === w.word && !w.solved) {
+      w.solved = true;
+      // помечаем клетки
+      for (const p of w.cells) {
+        cells[`${p.r},${p.c}`].el.classList.add("solved");
+      }
+      for (const item of w.listItems || []) item.classList.add("solved");
+      toast(`✓ ${w.word}`, "success");
+    } else if (w.solved && guess !== w.word) {
+      // Если разорвали уже разгаданное (пересечением) — снимаем
+      w.solved = false;
+      for (const p of w.cells) {
+        // только если клетка не входит в другое разгаданное слово
+        const stillSolved = words.some(o => o.solved && o !== w && o.cells.some(q => q.r === p.r && q.c === p.c));
+        if (!stillSolved) cells[`${p.r},${p.c}`].el.classList.remove("solved");
+      }
+      for (const item of w.listItems || []) item.classList.remove("solved");
+    }
+  }
+  render();
+  // финал
+  if (words.every(w => w.solved)) finish();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════
+function fmt(s) {
+  const m = Math.floor(s / 60), ss = s % 60;
+  return String(m).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
+}
+function startTimer() {
+  if (!startTime) startTime = Date.now();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById("timer").textContent = fmt(elapsed);
+  }, 1000);
+}
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE / LOAD
+// ═══════════════════════════════════════════════════════════
+function save() {
+  const data = {};
+  for (const k in cells) {
+    if (cells[k].input.value) data[k] = cells[k].input.value;
+  }
+  localStorage.setItem(storageKey(), JSON.stringify({
+    cells: data,
+    startTime,
+  }));
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(storageKey());
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o.startTime) startTime = o.startTime;
+    if (o.cells) {
+      for (const k in o.cells) {
+        if (cells[k]) cells[k].input.value = o.cells[k];
+      }
+    }
+    checkWord();
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════
+function btnCheck() {
+  let wrong = 0;
+  for (const k in cells) {
+    const c = cells[k];
+    if (c.input.value && c.input.value !== c.letter) {
+      c.el.classList.add("wrong");
+      setTimeout(() => c.el.classList.remove("wrong"), 500);
+      wrong++;
+    }
+  }
+  if (wrong === 0) toast("Ошибок нет", "success");
+  else toast(`Найдено ошибок: ${wrong}`, "error");
+}
+function btnHint() {
+  if (!activeWord) { toast("Выберите слово", "error"); return; }
+  // Найти первую пустую/неверную клетку в активном слове
+  for (let i = 0; i < activeWord.cells.length; i++) {
+    const p = activeWord.cells[i];
+    const c = cells[`${p.r},${p.c}`];
+    if (c.input.value !== c.letter) {
+      c.input.value = c.letter;
+      activeCellIdx = i;
+      checkWord(); save(); render(); focusActive();
+      return;
+    }
+  }
+  toast("Слово уже решено", "success");
+}
+function btnReveal() {
+  if (!activeWord) { toast("Выберите слово", "error"); return; }
+  if (!confirm("Открыть всё слово? Засчитается только при ручном вводе.")) return;
+  for (const p of activeWord.cells) {
+    cells[`${p.r},${p.c}`].input.value = cells[`${p.r},${p.c}`].letter;
+  }
+  checkWord(); save();
+}
+function btnClear() {
+  if (!confirm("Очистить все ответы и таймер?")) return;
+  for (const k in cells) cells[k].input.value = "";
+  localStorage.removeItem(storageKey());
+  startTime = null;
+  document.getElementById("timer").textContent = "00:00";
+  for (const w of words) w.solved = false;
+  document.querySelectorAll(".cell").forEach(c => c.classList.remove("solved"));
+  document.querySelectorAll(".clue-item").forEach(c => c.classList.remove("solved"));
+  render();
+  startTimer();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FINISH
+// ═══════════════════════════════════════════════════════════
+function finish() {
+  stopTimer();
+  const t = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+  document.getElementById("finish-time").textContent = fmt(t);
+  setTimeout(() => document.getElementById("finish").classList.add("show"), 400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg, type) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show " + (type || "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+// ═══════════════════════════════════════════════════════════
+// VIRTUAL KEYBOARD
+// ═══════════════════════════════════════════════════════════
+function buildKeyboard() {
+  const rows = [
+    "ЙЦУКЕНГШЩЗХЪ".split(""),
+    "ФЫВАПРОЛДЖЭ".split(""),
+    ["⌫", ..."ЯЧСМИТЬБЮ".split(""), "→"],
+  ];
+  const kb = document.getElementById("keyboard");
+  for (const row of rows) {
+    const div = document.createElement("div");
+    div.className = "kbd-row";
+    for (const k of row) {
+      const b = document.createElement("button");
+      b.className = "key" + (k === "⌫" || k === "→" ? " wide" : "");
+      b.textContent = k;
+      b.type = "button";
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!activeWord) return;
+        const p = activeWord.cells[activeCellIdx];
+        const cell = cells[`${p.r},${p.c}`];
+        if (k === "⌫") {
+          if (cell.input.value) { cell.input.value = ""; checkWord(); save(); }
+          else retreatCursor();
+        } else if (k === "→") {
+          nextWord(1);
+        } else {
+          cell.input.value = k;
+          advanceCursor();
+          checkWord(); save();
+        }
+      });
+      div.appendChild(b);
+    }
+    kb.appendChild(div);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+buildGrid();
+numberAndWire();
+attachCellHandlers();
+buildKeyboard();
+load();
+startTimer();
+render();
+// auto-select первое слово
+if (!activeWord) selectWord([...words].sort((a, b) => a.num - b.num)[0]);
+
+document.getElementById("btn-check").addEventListener("click", btnCheck);
+document.getElementById("btn-hint").addEventListener("click", btnHint);
+document.getElementById("btn-reveal").addEventListener("click", btnReveal);
+document.getElementById("btn-clear").addEventListener("click", btnClear);
+document.getElementById("prev-word").addEventListener("click", () => nextWord(-1));
+document.getElementById("next-word").addEventListener("click", () => nextWord(1));
+
+// ═══════════════════════════════════════════════════════════
+// MOBILE: bottom bar + modals + keyboard height var
+// ═══════════════════════════════════════════════════════════
+function updateKbdHeight() {
+  const kb = document.getElementById("keyboard");
+  const h = kb.offsetHeight || 0;
+  document.documentElement.style.setProperty("--kbd-h", h + "px");
+}
+window.addEventListener("resize", updateKbdHeight);
+updateKbdHeight();
+
+// Mobile bottom bar buttons
+document.getElementById("mbar-prev").addEventListener("click", () => nextWord(-1));
+document.getElementById("mbar-next").addEventListener("click", () => nextWord(1));
+document.getElementById("mbar-hint").addEventListener("click", btnHint);
+
+// Modals
+const backdrop = document.getElementById("modal-backdrop");
+const modalClues = document.getElementById("modal-clues");
+const modalTools = document.getElementById("modal-tools");
+
+function openModal(m) {
+  backdrop.classList.add("show");
+  m.classList.add("show");
+}
+function closeModals() {
+  backdrop.classList.remove("show");
+  modalClues.classList.remove("show");
+  modalTools.classList.remove("show");
+}
+document.getElementById("open-clues").addEventListener("click", () => openModal(modalClues));
+document.getElementById("open-tools").addEventListener("click", () => openModal(modalTools));
+backdrop.addEventListener("click", closeModals);
+document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", closeModals));
+
+// Табы в модалке вопросов
+document.querySelectorAll(".modal-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".modal-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.getElementById("modal-clues-h").style.display = tab === "h" ? "" : "none";
+    document.getElementById("modal-clues-v").style.display = tab === "v" ? "" : "none";
+  });
+});
+
+// Действия в tools-модалке
+document.querySelectorAll("#modal-tools [data-act]").forEach(b => {
+  b.addEventListener("click", () => {
+    const act = b.dataset.act;
+    closeModals();
+    if (act === "check") btnCheck();
+    else if (act === "hint") btnHint();
+    else if (act === "reveal") btnReveal();
+    else if (act === "clear") btnClear();
+    else if (act === "share") shareResult();
+    else if (act === "print") doPrint();
+  });
+});
+
+// Закрытие модалок по Escape
+window.addEventListener("keydown", e => { if (e.key === "Escape") closeModals(); });
+
+document.querySelector(".board-wrap").dataset.variant = "final";
+
+// ═══════════════════════════════════════════════════════════
+// SOUND (Web Audio)
+// ═══════════════════════════════════════════════════════════
+let audioCtx = null;
+let soundOn = localStorage.getItem("mdk_sound") !== "0";
+function audio() {
+  if (!soundOn) return null;
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+  return audioCtx;
+}
+function beep(freq, dur, type = "sine", gainVal = 0.07) {
+  const ctx = audio();
+  if (!ctx) return;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.value = gainVal;
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start();
+  o.stop(ctx.currentTime + dur);
+}
+function sndKey()   { beep(720, 0.04, "square", 0.04); }
+function sndWord()  {
+  beep(880, 0.08, "sine", 0.08);
+  setTimeout(() => beep(1175, 0.12, "sine", 0.08), 80);
+}
+function sndError() { beep(180, 0.18, "sawtooth", 0.05); }
+function sndFinish() {
+  const notes = [523, 659, 784, 1047]; // C E G C
+  notes.forEach((f, i) => setTimeout(() => beep(f, 0.18, "triangle", 0.09), i * 130));
+}
+function updateSoundIcon() {
+  document.getElementById("btn-sound").textContent = soundOn ? "🔊" : "🔇";
+  document.getElementById("btn-sound").classList.toggle("off", !soundOn);
+}
+document.getElementById("btn-sound").addEventListener("click", () => {
+  soundOn = !soundOn;
+  localStorage.setItem("mdk_sound", soundOn ? "1" : "0");
+  updateSoundIcon();
+  if (soundOn) sndKey();
+});
+updateSoundIcon();
+
+// Хук-обёртки для звука: расширяем onInput и checkWord без копипасты
+const _origOnInput = onInput;
+onInput = function(cell, e) {
+  const before = cell.input.value;
+  _origOnInput(cell, e);
+  if (cell.input.value && cell.input.value !== before) sndKey();
+};
+// Перепривяжем listeners (они уже были на старом onInput, но JS захватил замыкание — переподпишем)
+for (const k in cells) {
+  const c = cells[k];
+  const newInput = c.input.cloneNode(true);
+  c.input.parentNode.replaceChild(newInput, c.input);
+  c.input = newInput;
+  c.input.addEventListener("focus", () => onCellClick(c, true));
+  c.input.addEventListener("input", e => onInput(c, e));
+  c.input.addEventListener("keydown", e => onKeyDown(c, e));
+}
+
+const _origCheckWord = checkWord;
+let _solvedSnapshot = new Set();
+checkWord = function() {
+  const beforeSolved = new Set(words.filter(w => w.solved).map(w => w.word));
+  _origCheckWord();
+  const afterSolved = new Set(words.filter(w => w.solved).map(w => w.word));
+  for (const w of afterSolved) if (!beforeSolved.has(w)) sndWord();
+};
+const _origFinish = finish;
+finish = function() { _origFinish(); sndFinish(); };
+const _origBtnCheck = btnCheck;
+btnCheck = function() {
+  let wrong = 0;
+  for (const k in cells) {
+    const c = cells[k];
+    if (c.input.value && c.input.value !== c.letter) wrong++;
+  }
+  _origBtnCheck();
+  if (wrong > 0) sndError();
+};
+
+// ═══════════════════════════════════════════════════════════
+// SHARE (Canvas screenshot)
+// ═══════════════════════════════════════════════════════════
+function renderShareCanvas() {
+  const CELL = 40, PAD = 30, HEADER = 80;
+  const w = DATA.cols * CELL + PAD * 2;
+  const h = DATA.rows * CELL + PAD * 2 + HEADER + 60;
+  const cnv = document.createElement("canvas");
+  cnv.width = w; cnv.height = h;
+  const ctx = cnv.getContext("2d");
+  // фон
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, "#0a1224");
+  grad.addColorStop(1, "#060914");
+  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+  // header
+  ctx.fillStyle = "#00e5ff";
+  ctx.font = "bold 22px -apple-system, system-ui, sans-serif";
+  ctx.fillText(`МДК 02.02 · Кроссворд по транспортным сетям`, PAD, 36);
+  ctx.fillStyle = "#d6e4ff";
+  ctx.font = "16px monospace";
+  const solvedN = words.filter(w => w.solved).length;
+  ctx.fillText(`Решено: ${solvedN}/15   Время: ${document.getElementById("timer").textContent}`, PAD, 62);
+  // сетка
+  for (let r = 0; r < DATA.rows; r++) {
+    for (let c = 0; c < DATA.cols; c++) {
+      const x = PAD + c * CELL;
+      const y = HEADER + PAD + r * CELL;
+      const letter = DATA.grid[r][c];
+      if (!letter) continue;
+      const userVal = (cells[`${r},${c}`] && cells[`${r},${c}`].input.value) || "";
+      ctx.fillStyle = userVal === letter ? "rgba(46,230,118,0.18)" : "#0a1224";
+      ctx.fillRect(x, y, CELL-2, CELL-2);
+      ctx.strokeStyle = userVal === letter ? "rgba(46,230,118,0.5)" : "rgba(0,229,255,0.25)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x+0.5, y+0.5, CELL-3, CELL-3);
+      if (userVal) {
+        ctx.fillStyle = userVal === letter ? "#2ee676" : "#ff4d6d";
+        ctx.font = "bold 20px monospace";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(userVal, x + (CELL-2)/2, y + (CELL-2)/2 + 1);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+      }
+      // номер
+      const cellObj = cells[`${r},${c}`];
+      if (cellObj && cellObj.num) {
+        ctx.fillStyle = "#ffb000";
+        ctx.font = "bold 10px monospace";
+        ctx.fillText(String(cellObj.num), x + 3, y + 11);
+      }
+    }
+  }
+  // подпись внизу
+  ctx.fillStyle = "#6c7a99";
+  ctx.font = "11px monospace";
+  ctx.fillText("МДК 02.02 ТРАНСПОРТНЫЕ СЕТИ СВЯЗИ", PAD, h - 18);
+  return cnv;
+}
+
+async function shareResult() {
+  const cnv = renderShareCanvas();
+  cnv.toBlob(async (blob) => {
+    if (!blob) { toast("Не получилось создать картинку", "error"); return; }
+    // Сначала пробуем clipboard
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        toast("Картинка скопирована в буфер", "success");
+        return;
+      }
+    } catch (e) {}
+    // fallback — скачиваем
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mdk-crossword-result.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Картинка сохранена", "success");
+  }, "image/png");
+}
+document.getElementById("btn-share").addEventListener("click", shareResult);
+
+// ═══════════════════════════════════════════════════════════
+// PRINT
+// ═══════════════════════════════════════════════════════════
+function doPrint() {
+  // Спросим: с ответами или без
+  const withAnswers = confirm("Печатать С ответами (учительский экземпляр)?\nОК — с ответами\nОтмена — пустой бланк для учеников");
+  document.body.dataset.print = withAnswers ? "answers" : "blank";
+  // Дать браузеру миг применить стили
+  setTimeout(() => {
+    window.print();
+    delete document.body.dataset.print;
+  }, 50);
+}
+document.getElementById("btn-print").addEventListener("click", doPrint);
+</script>
+</body>
+</html>
